@@ -146,4 +146,30 @@ describe("Time Capsule Contract Tests", () => {
     
     expect(result).toBeErr(Cl.uint(102)); // ERR-TOO-EARLY
   });
+
+  it("should successfully claim vault after unlock time", () => {
+    const amount = 1000000;
+    const unlockBlock = simnet.burnBlockHeight + 5;
+    
+    // Create a vault
+    simnet.callPublicFn(
+      "Time_Capsule",
+      "create-vault",
+      [Cl.uint(amount), Cl.uint(unlockBlock), Cl.principal(wallet2)],
+      wallet1
+    );
+    
+    // Mine blocks to pass unlock time
+    simnet.mineEmptyBurnBlocks(10);
+    
+    // Claim as beneficiary
+    const { result } = simnet.callPublicFn(
+      "Time_Capsule",
+      "claim-vault",
+      [Cl.uint(1)],
+      wallet2
+    );
+    
+    expect(result).toBeOk(Cl.bool(true));
+  });
 });
