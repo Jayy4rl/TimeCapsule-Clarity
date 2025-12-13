@@ -41,4 +41,18 @@ describe("Time Capsule Contract Tests", () => {
     
     expect(result).toBeErr(Cl.uint(104)); // ERR-INVALID-AMOUNT
   });
+
+  it("should fail to create vault with unlock block in the past", () => {
+    const amount = 1000000;
+    const unlockBlock = 1; // Past block
+    
+    const { result } = simnet.callPublicFn(
+      "Time_Capsule",
+      "create-vault",
+      [Cl.uint(amount), Cl.uint(unlockBlock), Cl.principal(wallet2)],
+      wallet1
+    );
+    
+    expect(result).toBeErr(Cl.uint(105)); // ERR-INVALID-UNLOCK-TIME
+  });
 });
