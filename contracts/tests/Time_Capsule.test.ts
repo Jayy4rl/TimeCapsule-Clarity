@@ -332,4 +332,37 @@ describe("Time Capsule Contract Tests", () => {
     );
     expect(result3).toBeOk(Cl.uint(3));
   });
+
+  it("should transfer STX correctly when claiming vault", () => {
+    const amount = 1000000; // 1 STX
+    const unlockBlock = simnet.burnBlockHeight + 5;
+
+    // Get initial balance of beneficiary (wallet2)
+    const initialBalance = simnet.getAssetsMap().get("STX")?.get(wallet2) || 0n;
+
+    // Create a vault
+    simnet.callPublicFn(
+      "Time_Capsule",
+      "create-vault",
+      [Cl.uint(amount), Cl.uint(unlockBlock), Cl.principal(wallet2)],
+      wallet1
+    );
+
+    // Mine blocks to pass unlock time
+    simnet.mineEmptyBurnBlocks(10);
+
+    // Claim as beneficiary
+    simnet.callPublicFn(
+      "Time_Capsule",
+      "claim-vault",
+      [Cl.uint(1)],
+      wallet2
+    );
+
+    // Get final balance of beneficiary
+    const finalBalance = simnet.getAssetsMap().get("STX")?.get(wallet2) || 0n;
+
+    // Beneficiary should have received the STX amount
+    expect(finalBalance - initialBalance).toBe(BigInt(amount));
+  });
 });
