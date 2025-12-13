@@ -234,4 +234,29 @@ describe("Time Capsule Contract Tests", () => {
 
     expect(result).toBeBool(false);
   });
+
+  it("should return true for is-unlockable after unlock time", () => {
+    const amount = 1000000;
+    const unlockBlock = simnet.burnBlockHeight + 5;
+
+    // Create a vault
+    simnet.callPublicFn(
+      "Time_Capsule",
+      "create-vault",
+      [Cl.uint(amount), Cl.uint(unlockBlock), Cl.principal(wallet2)],
+      wallet1
+    );
+
+    // Mine blocks to pass unlock time
+    simnet.mineEmptyBurnBlocks(10);
+
+    const { result } = simnet.callReadOnlyFn(
+      "Time_Capsule",
+      "is-unlockable",
+      [Cl.uint(1)],
+      wallet1
+    );
+
+    expect(result).toBeBool(true);
+  });
 });
