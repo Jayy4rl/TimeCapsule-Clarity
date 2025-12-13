@@ -67,10 +67,10 @@ plan:
             contract-name: Time_Capsule
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/Time_Capsule.clar
-            clarity-version: 4
+            clarity-version: 3
         - emulated-contract-publish:
             contract-name: wallet
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/wallet.clar
-            clarity-version: 4
-      epoch: "3.3"
+            clarity-version: 3
+      epoch: "3.0"
