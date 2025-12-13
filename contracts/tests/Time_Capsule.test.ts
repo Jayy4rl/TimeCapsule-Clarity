@@ -206,4 +206,15 @@ describe("Time Capsule Contract Tests", () => {
     
     expect(result).toBeErr(Cl.uint(101)); // ERR-ALREADY-CLAIMED
   });
+
+  it("should fail to claim non-existent capsule", () => {
+    const { result } = simnet.callPublicFn(
+      "Time_Capsule",
+      "claim-vault",
+      [Cl.uint(999)],
+      wallet1
+    );
+    
+    expect(result).toBeErr(Cl.uint(100)); // ERR-CAPSULE-NOT-FOUND
+  });
 });
