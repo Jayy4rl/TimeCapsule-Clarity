@@ -259,4 +259,15 @@ describe("Time Capsule Contract Tests", () => {
 
     expect(result).toBeBool(true);
   });
+
+  it("should return false for is-unlockable on non-existent capsule", () => {
+    const { result } = simnet.callReadOnlyFn(
+      "Time_Capsule",
+      "is-unlockable",
+      [Cl.uint(999)],
+      wallet1
+    );
+
+    expect(result).toBeBool(false);
+  });
 });
