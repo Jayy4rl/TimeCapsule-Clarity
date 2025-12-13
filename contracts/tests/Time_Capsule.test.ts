@@ -300,4 +300,36 @@ describe("Time Capsule Contract Tests", () => {
 
     expect(result).toBeUint(2);
   });
+
+  it("should increment capsule nonce correctly when creating multiple vaults", () => {
+    const amount = 1000000;
+    const unlockBlock = simnet.burnBlockHeight + 100;
+
+    // Create first vault - should return id 1
+    const { result: result1 } = simnet.callPublicFn(
+      "Time_Capsule",
+      "create-vault",
+      [Cl.uint(amount), Cl.uint(unlockBlock), Cl.principal(wallet2)],
+      wallet1
+    );
+    expect(result1).toBeOk(Cl.uint(1));
+
+    // Create second vault - should return id 2
+    const { result: result2 } = simnet.callPublicFn(
+      "Time_Capsule",
+      "create-vault",
+      [Cl.uint(amount), Cl.uint(unlockBlock), Cl.principal(wallet2)],
+      wallet1
+    );
+    expect(result2).toBeOk(Cl.uint(2));
+
+    // Create third vault - should return id 3
+    const { result: result3 } = simnet.callPublicFn(
+      "Time_Capsule",
+      "create-vault",
+      [Cl.uint(amount), Cl.uint(unlockBlock), Cl.principal(wallet2)],
+      wallet1
+    );
+    expect(result3).toBeOk(Cl.uint(3));
+  });
 });
