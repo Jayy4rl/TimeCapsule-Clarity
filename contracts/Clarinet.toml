@@ -1,0 +1,30 @@
+[project]
+name = 'contracts'
+description = ''
+authors = []
+telemetry = true
+cache_dir = './.cache'
+requirements = []
+[contracts.wallet]
+path = 'contracts/wallet.clar'
+clarity_version = 3
+epoch = '3.0'
+
+[contracts.Time_Capsule]
+path = 'contracts/Time_Capsule.clar'
+clarity_version = 3
+epoch = '3.0'
+[repl.analysis]
+passes = ['check_checker']
+
+[repl.analysis.lints]
+
+[repl.analysis.check_checker]
+strict = false
+trusted_sender = false
+trusted_caller = false
+callee_filter = false
+
+[repl.remote_data]
+enabled = false
+api_url = 'https://api.hiro.so'
