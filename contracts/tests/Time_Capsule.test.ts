@@ -97,4 +97,30 @@ describe("Time Capsule Contract Tests", () => {
     
     expect(result).toBeNone();
   });
+
+  it("should fail to claim vault if not the beneficiary", () => {
+    const amount = 1000000;
+    const unlockBlock = simnet.burnBlockHeight + 1;
+    
+    // Create a vault
+    simnet.callPublicFn(
+      "Time_Capsule",
+      "create-vault",
+      [Cl.uint(amount), Cl.uint(unlockBlock), Cl.principal(wallet2)],
+      wallet1
+    );
+    
+    // Mine blocks to pass unlock time
+    simnet.mineEmptyBurnBlocks(10);
+    
+    // Try to claim as wrong user (wallet1 instead of wallet2)
+    const { result } = simnet.callPublicFn(
+      "Time_Capsule",
+      "claim-vault",
+      [Cl.uint(1)],
+      wallet1
+    );
+    
+    expect(result).toBeErr(Cl.uint(103)); // ERR-NOT-BENEFICIARY
+  });
 });
