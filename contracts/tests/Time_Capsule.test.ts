@@ -55,4 +55,35 @@ describe("Time Capsule Contract Tests", () => {
     
     expect(result).toBeErr(Cl.uint(105)); // ERR-INVALID-UNLOCK-TIME
   });
+
+  it("should return capsule details with get-capsule", () => {
+    const amount = 1000000;
+    const unlockBlock = simnet.burnBlockHeight + 100;
+    
+    // Create a vault first
+    simnet.callPublicFn(
+      "Time_Capsule",
+      "create-vault",
+      [Cl.uint(amount), Cl.uint(unlockBlock), Cl.principal(wallet2)],
+      wallet1
+    );
+    
+    // Get capsule details
+    const { result } = simnet.callReadOnlyFn(
+      "Time_Capsule",
+      "get-capsule",
+      [Cl.uint(1)],
+      wallet1
+    );
+    
+    expect(result).toBeSome(
+      Cl.tuple({
+        owner: Cl.principal(wallet1),
+        amount: Cl.uint(amount),
+        "unlock-block": Cl.uint(unlockBlock),
+        beneficiary: Cl.principal(wallet2),
+        "is-claimed": Cl.bool(false)
+      })
+    );
+  });
 });
