@@ -28,4 +28,17 @@ describe("Time Capsule Contract Tests", () => {
     
     expect(result).toBeOk(Cl.uint(1));
   });
+
+  it("should fail to create vault with zero amount", () => {
+    const unlockBlock = simnet.burnBlockHeight + 100;
+    
+    const { result } = simnet.callPublicFn(
+      "Time_Capsule",
+      "create-vault",
+      [Cl.uint(0), Cl.uint(unlockBlock), Cl.principal(wallet2)],
+      wallet1
+    );
+    
+    expect(result).toBeErr(Cl.uint(104)); // ERR-INVALID-AMOUNT
+  });
 });
