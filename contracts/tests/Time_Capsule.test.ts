@@ -270,4 +270,34 @@ describe("Time Capsule Contract Tests", () => {
 
     expect(result).toBeBool(false);
   });
+
+  it("should return correct capsule count after creating vaults", () => {
+    const amount = 1000000;
+    const unlockBlock = simnet.burnBlockHeight + 100;
+
+    // Create first vault
+    simnet.callPublicFn(
+      "Time_Capsule",
+      "create-vault",
+      [Cl.uint(amount), Cl.uint(unlockBlock), Cl.principal(wallet2)],
+      wallet1
+    );
+
+    // Create second vault
+    simnet.callPublicFn(
+      "Time_Capsule",
+      "create-vault",
+      [Cl.uint(amount), Cl.uint(unlockBlock), Cl.principal(wallet2)],
+      wallet1
+    );
+
+    const { result } = simnet.callReadOnlyFn(
+      "Time_Capsule",
+      "get-capsule-count",
+      [],
+      wallet1
+    );
+
+    expect(result).toBeUint(2);
+  });
 });
