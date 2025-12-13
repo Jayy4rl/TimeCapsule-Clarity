@@ -86,4 +86,15 @@ describe("Time Capsule Contract Tests", () => {
       })
     );
   });
+
+  it("should return none for non-existent capsule", () => {
+    const { result } = simnet.callReadOnlyFn(
+      "Time_Capsule",
+      "get-capsule",
+      [Cl.uint(999)],
+      wallet1
+    );
+    
+    expect(result).toBeNone();
+  });
 });
