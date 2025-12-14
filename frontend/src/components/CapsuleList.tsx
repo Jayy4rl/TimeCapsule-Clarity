@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useTimeCapsule, Capsule } from '../hooks/useTimeCapsule';
+import { useTimeCapsule } from '../hooks/useTimeCapsule';
+import type { Capsule } from '../hooks/useTimeCapsule';
 import { useWallet } from '../context/WalletContext';
 import './CapsuleList.css';
 

@@ -1,11 +1,12 @@
-import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { AppConfig, UserSession, showConnect, disconnect } from '@stacks/connect';
 
 // App configuration
 const appConfig = new AppConfig(['store_write', 'publish_data']);
 
 // Create user session
-export const userSession = new UserSession({ appConfig });
+const userSession = new UserSession({ appConfig });
 
 interface WalletContextType {
   isConnected: boolean;
@@ -25,18 +26,7 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
   const [isConnected, setIsConnected] = useState(false);
   const [userAddress, setUserAddress] = useState<string | null>(null);
 
-  // Check if user is already signed in
-  useEffect(() => {
-    if (userSession.isSignInPending()) {
-      userSession.handlePendingSignIn().then(() => {
-        updateConnectionState();
-      });
-    } else if (userSession.isUserSignedIn()) {
-      updateConnectionState();
-    }
-  }, []);
-
-  const updateConnectionState = () => {
+  const updateConnectionState = useCallback(() => {
     if (userSession.isUserSignedIn()) {
       const userData = userSession.loadUserData();
       // Use testnet address for testnet, mainnet for mainnet
@@ -47,7 +37,18 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
       setUserAddress(null);
       setIsConnected(false);
     }
-  };
+  }, []);
+
+  // Check if user is already signed in
+  useEffect(() => {
+    if (userSession.isSignInPending()) {
+      userSession.handlePendingSignIn().then(() => {
+        updateConnectionState();
+      });
+    } else if (userSession.isUserSignedIn()) {
+      updateConnectionState();
+    }
+  }, [updateConnectionState]);
 
   const connectWallet = useCallback(() => {
     showConnect({
@@ -63,7 +64,7 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
       },
       userSession,
     });
-  }, []);
+  }, [updateConnectionState]);
 
   const disconnectWallet = useCallback(() => {
     disconnect();
@@ -87,6 +88,7 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useWallet = () => {
   const context = useContext(WalletContext);
   if (context === undefined) {

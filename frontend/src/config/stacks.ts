@@ -1,4 +1,9 @@
-import { StacksMainnet, StacksTestnet, StacksDevnet } from '@stacks/network';
+import { 
+  STACKS_MAINNET, 
+  STACKS_TESTNET, 
+  STACKS_DEVNET,
+  type StacksNetwork 
+} from '@stacks/network';
 
 // Contract deployment details - update these after deployment
 export const CONTRACT_ADDRESS = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM'; // Update with your deployed contract address
@@ -7,16 +12,16 @@ export const CONTRACT_NAME = 'Time_Capsule';
 // Network configuration
 export type NetworkType = 'mainnet' | 'testnet' | 'devnet';
 
-export const getNetwork = (networkType: NetworkType = 'testnet') => {
+export const getNetwork = (networkType: NetworkType = 'testnet'): StacksNetwork => {
   switch (networkType) {
     case 'mainnet':
-      return new StacksMainnet();
+      return STACKS_MAINNET;
     case 'testnet':
-      return new StacksTestnet();
+      return STACKS_TESTNET;
     case 'devnet':
-      return new StacksDevnet();
+      return STACKS_DEVNET;
     default:
-      return new StacksTestnet();
+      return STACKS_TESTNET;
   }
 };
 

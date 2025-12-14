@@ -1,8 +1,6 @@
 import { useCallback } from 'react';
-import {
-  openContractCall,
-  ContractCallOptions,
-} from '@stacks/connect';
+import { openContractCall } from '@stacks/connect';
+import type { ContractCallOptions } from '@stacks/connect';
 import {
   uintCV,
   principalCV,
@@ -21,7 +19,7 @@ export interface Capsule {
 }
 
 export const useTimeCapsule = () => {
-  const { userSession, isConnected } = useWallet();
+  const { isConnected } = useWallet();
 
   /**
    * Create a new time-locked vault
@@ -57,7 +55,7 @@ export const useTimeCapsule = () => {
 
       await openContractCall(options);
     },
-    [isConnected, userSession]
+    [isConnected]
   );
 
   /**
@@ -88,7 +86,7 @@ export const useTimeCapsule = () => {
 
       await openContractCall(options);
     },
-    [isConnected, userSession]
+    [isConnected]
   );
 
   /**
