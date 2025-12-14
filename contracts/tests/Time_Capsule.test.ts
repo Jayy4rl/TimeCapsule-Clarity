@@ -338,7 +338,11 @@ describe("Time Capsule Contract Tests", () => {
     const unlockBlock = simnet.burnBlockHeight + 5;
 
     // Get initial balance of beneficiary (wallet2)
-    const initialBalance = simnet.getAssetsMap().get("STX")?.get(wallet2) || 0n;
+    const initialBalance =
+      simnet
+        .getAssetsMap()
+        .get("STX")
+        ?.get(wallet2) || 0n;
 
     // Create a vault
     simnet.callPublicFn(
@@ -352,15 +356,14 @@ describe("Time Capsule Contract Tests", () => {
     simnet.mineEmptyBurnBlocks(10);
 
     // Claim as beneficiary
-    simnet.callPublicFn(
-      "Time_Capsule",
-      "claim-vault",
-      [Cl.uint(1)],
-      wallet2
-    );
+    simnet.callPublicFn("Time_Capsule", "claim-vault", [Cl.uint(1)], wallet2);
 
     // Get final balance of beneficiary
-    const finalBalance = simnet.getAssetsMap().get("STX")?.get(wallet2) || 0n;
+    const finalBalance =
+      simnet
+        .getAssetsMap()
+        .get("STX")
+        ?.get(wallet2) || 0n;
 
     // Beneficiary should have received the STX amount
     expect(finalBalance - initialBalance).toBe(BigInt(amount));

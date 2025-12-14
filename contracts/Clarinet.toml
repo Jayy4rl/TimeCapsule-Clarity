@@ -5,13 +5,13 @@ authors = []
 telemetry = true
 cache_dir = './.cache'
 requirements = []
-[contracts.wallet]
-path = 'contracts/wallet.clar'
+[contracts.Time_Capsule]
+path = 'contracts/Time_Capsule.clar'
 clarity_version = 3
 epoch = '3.0'
 
-[contracts.Time_Capsule]
-path = 'contracts/Time_Capsule.clar'
+[contracts.wallet]
+path = 'contracts/wallet.clar'
 clarity_version = 3
 epoch = '3.0'
 [repl.analysis]
