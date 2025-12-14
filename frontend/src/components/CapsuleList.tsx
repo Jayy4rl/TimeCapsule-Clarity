@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTimeCapsule } from '../hooks/useTimeCapsule';
 import type { Capsule } from '../hooks/useTimeCapsule';
 import { useWallet } from '../context/WalletContext';
+import { fetchBlockInfo, calculateEstimatedTime, microStxToStx, truncateAddress } from '../utils/stacks';
 import './CapsuleList.css';
 
 interface CapsuleWithId extends Capsule {
@@ -17,6 +18,20 @@ export const CapsuleList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchId, setSearchId] = useState('');
+  const [currentBlock, setCurrentBlock] = useState<number | null>(null);
+
+  // Fetch current block
+  useEffect(() => {
+    const loadBlockInfo = async () => {
+      const info = await fetchBlockInfo();
+      if (info) {
+        setCurrentBlock(info.burn_block_height);
+      }
+    };
+    loadBlockInfo();
+    const interval = setInterval(loadBlockInfo, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const fetchCapsules = useCallback(async () => {
     setIsLoading(true);
@@ -84,14 +99,6 @@ export const CapsuleList = () => {
     }
   };
 
-  const formatStx = (microStx: number) => {
-    return (microStx / 1_000_000).toFixed(6);
-  };
-
-  const truncateAddress = (address: string) => {
-    return `${address.slice(0, 8)}...${address.slice(-6)}`;
-  };
-
   const canClaim = (capsule: CapsuleWithId) => {
     return (
       isConnected &&
@@ -120,6 +127,12 @@ export const CapsuleList = () => {
         </div>
       </div>
 
+      {currentBlock && (
+        <div className="current-block">
+          Current Block: <strong>{currentBlock.toLocaleString()}</strong>
+        </div>
+      )}
+
       {error && <div className="error">{error}</div>}
 
       {isLoading ? (
@@ -144,7 +157,7 @@ export const CapsuleList = () => {
 
               <div className="capsule-amount">
                 <span className="label">Amount</span>
-                <span className="value">{formatStx(capsule.amount)} STX</span>
+                <span className="value">{microStxToStx(capsule.amount)} STX</span>
               </div>
 
               <div className="capsule-details">
@@ -152,6 +165,14 @@ export const CapsuleList = () => {
                   <span className="label">Unlock Block</span>
                   <span className="value">{capsule.unlockBlock.toLocaleString()}</span>
                 </div>
+                {currentBlock && !capsule.isClaimed && (
+                  <div className="detail">
+                    <span className="label">Time Remaining</span>
+                    <span className="value time-remaining">
+                      {calculateEstimatedTime(currentBlock, capsule.unlockBlock)}
+                    </span>
+                  </div>
+                )}
                 <div className="detail">
                   <span className="label">Owner</span>
                   <span className="value address">{truncateAddress(capsule.owner)}</span>

@@ -59,6 +59,20 @@
   background: #059669 !important;
 }
 
+.current-block {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  color: #0369a1;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.current-block strong {
+  font-weight: 700;
+}
+
 .error {
   background: #fef2f2;
   color: #dc2626;
@@ -190,6 +204,11 @@
 .detail .value.address {
   font-family: monospace;
   font-size: 12px;
+}
+
+.detail .value.time-remaining {
+  color: #f59e0b;
+  font-weight: 600;
 }
 
 .claim-btn {
