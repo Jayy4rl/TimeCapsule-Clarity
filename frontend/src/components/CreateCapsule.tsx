@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import { useTimeCapsule } from '../hooks/useTimeCapsule';
 import { useWallet } from '../context/WalletContext';
+import { fetchBlockInfo, stxToMicroStx, isValidStacksAddress } from '../utils/stacks';
 import './CreateCapsule.css';
 
 export const CreateCapsule = () => {
@@ -13,6 +14,22 @@ export const CreateCapsule = () => {
   const [beneficiary, setBeneficiary] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentBlock, setCurrentBlock] = useState<number | null>(null);
+
+  // Fetch current block on mount
+  useEffect(() => {
+    const loadBlockInfo = async () => {
+      const info = await fetchBlockInfo();
+      if (info) {
+        setCurrentBlock(info.burn_block_height);
+      }
+    };
+    loadBlockInfo();
+    
+    // Refresh every minute
+    const interval = setInterval(loadBlockInfo, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -23,21 +40,23 @@ export const CreateCapsule = () => {
       return;
     }
 
+    if (!currentBlock) {
+      setError('Unable to fetch current block. Please try again.');
+      return;
+    }
+
+    // Validate beneficiary address if provided
+    if (beneficiary && !isValidStacksAddress(beneficiary)) {
+      setError('Invalid Stacks address format');
+      return;
+    }
+
     try {
       setIsLoading(true);
 
-      // Convert STX to microSTX (1 STX = 1,000,000 microSTX)
-      const microStx = Math.floor(parseFloat(amount) * 1_000_000);
-      
-      // Calculate unlock block (current + blocks to wait)
-      // For testnet, we estimate current block and add user input
+      const microStx = stxToMicroStx(parseFloat(amount));
       const blocksToWait = parseInt(unlockBlocks);
-      
-      // Use a reasonable estimate for current block height
-      // In production, fetch this from the API
-      const estimatedCurrentBlock = 180000; // Update based on network
-      const unlockBlock = estimatedCurrentBlock + blocksToWait;
-
+      const unlockBlock = currentBlock + blocksToWait;
       const beneficiaryAddress = beneficiary || userAddress!;
 
       await createVault(microStx, unlockBlock, beneficiaryAddress);
@@ -53,12 +72,22 @@ export const CreateCapsule = () => {
     }
   };
 
+  const estimatedUnlockBlock = currentBlock && unlockBlocks 
+    ? currentBlock + parseInt(unlockBlocks) 
+    : null;
+
   return (
     <div className="create-capsule">
       <h2>🔒 Create Time Capsule</h2>
       <p className="description">
         Lock your STX tokens until a specific block height. Only the beneficiary can claim after unlock.
       </p>
+
+      {currentBlock && (
+        <div className="block-info">
+          Current Block: <strong>{currentBlock.toLocaleString()}</strong>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit}>
         <div className="form-group">
@@ -90,6 +119,9 @@ export const CreateCapsule = () => {
           />
           <span className="hint">
             ~{unlockBlocks ? Math.round(parseInt(unlockBlocks) * 10 / 60) : 0} hours (avg 10 min/block)
+            {estimatedUnlockBlock && (
+              <> • Unlocks at block #{estimatedUnlockBlock.toLocaleString()}</>
+            )}
           </span>
         </div>
 
